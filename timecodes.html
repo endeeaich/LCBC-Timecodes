@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Timecodes</title>
+        <meta charset="UTF-8"> 
+    </head>
+
+    <body>
+        <h3>PVS Timecode Conversion</h3>
+        <div>
+            <label>Current Time:&nbsp;</label>
+            <input id = 'currentTime'/>&nbsp;
+            <input id = 'startTimerButton' type="button" value = "Start Timer"/>&nbsp;
+            <input id = 'stopTimerButton' type="button" value = "Stop Timer"/></div>
+        <table>
+            <tr>
+                <th>Timecode from chat</th>
+                <th></th>
+                <th>PVS Timecode</th>
+                <th>Time left</th>
+            </tr>
+            <tr>
+                <td><input id = 'chatRollInTimecode'/></td>
+                <td>Roll In</td>
+                <td><input id = 'pvsRollInTimecode' disabled/></td>
+                <td><input id = 'timeLeftRollIn' disabled/></td>
+            </tr>
+            <tr>
+                <td><input id = 'chatMessageStartTimecode'/></td>
+                <td>Message Start</td>
+                <td><input id = 'pvsMessageStartTimecode' disabled/></td>
+                <td><input id = 'timeLeftMessageStart' disabled/></td>
+            </tr>
+            <tr>
+                <td><input id = 'chatPrayerStartTimecode'/></td>
+                <td>Prayer Start</td>
+                <td><input id = 'pvsPrayerStartTimecode' disabled/></td>
+                <td><input id = 'timeLeftPrayerStart' disabled/></td>
+            </tr>
+            <tr>
+                <td><input id = 'chatPrayerEndTimecode'/></td>
+                <td>Prayer End</td>
+                <td><input id = 'pvsPrayerEndTimecode' disabled/></td>
+                <td><input id = 'timeLeftPrayerEnd' disabled/></td>
+            </tr>
+            <tr>
+                <td><input id = 'chatCommentsStartTimecode'/></td>
+                <td>Comments Start</td>
+                <td><input id = 'pvsCommentsStartTimecode' disabled/></td>
+                <td><input id = 'timeLeftCommentsStart' disabled/></td>
+            </tr>
+            <tr>
+                <td><input id = 'chatCommentsEndTimecode'/></td>
+                <td>Comments End</td>
+                <td><input id = 'pvsCommentsEndTimecode' disabled/></td>
+                <td><input id = 'timeLeftCommentsEnd' disabled/></td>
+            </tr>
+
+        </table>
+
+        <script src = "https://momentjs.com/downloads/moment.js"></script>
+        <script>
+            var calculatePvsTime = function(startTime, endTime) {
+                if (startTime && endTime) {
+                    var startDate = moment(startTime, "HH:mm:ss");
+                    var endDate = moment(endTime, "HH:mm:ss");
+
+                    if(startDate < endDate) {
+                        pvsTime = moment.utc(endDate.diff(startDate)).format("HH:mm:ss");
+                    } else {
+                        pvsTime = "00:00:00";
+                    }
+                
+
+                    return pvsTime;
+                }
+                return "";
+            }
+
+            document.getElementById("chatRollInTimecode").addEventListener("change", function() {
+                var startTime = document.getElementById("chatRollInTimecode").value;
+                var endTime =  document.getElementById("chatRollInTimecode").value;
+
+                document.getElementById("pvsRollInTimecode").value = calculatePvsTime(startTime, endTime);
+
+            });
+
+            document.getElementById("chatMessageStartTimecode").addEventListener("change", function() {
+                var startTime = document.getElementById("chatRollInTimecode").value;
+                var endTime =  document.getElementById("chatMessageStartTimecode").value;
+
+                document.getElementById("pvsMessageStartTimecode").value = calculatePvsTime(startTime, endTime);
+            });
+
+            document.getElementById("chatPrayerStartTimecode").addEventListener("change", function() {
+                var startTime = document.getElementById("chatRollInTimecode").value;
+                var endTime =  document.getElementById("chatPrayerStartTimecode").value;
+
+                document.getElementById("pvsPrayerStartTimecode").value = calculatePvsTime(startTime, endTime);
+            });
+
+            document.getElementById("chatPrayerEndTimecode").addEventListener("change", function() {
+                var startTime = document.getElementById("chatRollInTimecode").value;
+                var endTime =  document.getElementById("chatPrayerEndTimecode").value;
+                
+                document.getElementById("pvsPrayerEndTimecode").value = calculatePvsTime(startTime, endTime);
+            });
+
+            document.getElementById("chatCommentsStartTimecode").addEventListener("change", function() {
+                var startTime = document.getElementById("chatRollInTimecode").value;
+                var endTime =  document.getElementById("chatCommentsStartTimecode").value;
+
+                document.getElementById("pvsCommentsStartTimecode").value = calculatePvsTime(startTime, endTime);
+            });
+
+            document.getElementById("chatCommentsEndTimecode").addEventListener("change", function() {
+                var startTime = document.getElementById("chatRollInTimecode").value;
+                var endTime =  document.getElementById("chatCommentsEndTimecode").value;
+
+                document.getElementById("pvsCommentsEndTimecode").value = calculatePvsTime(startTime, endTime);
+            });
+
+            var calculateRemainingTime = function() {
+                //Set time remaining
+                var startTime = document.getElementById("currentTime").value;
+
+                document.getElementById("timeLeftRollIn").value = calculatePvsTime(startTime, document.getElementById("pvsRollInTimecode").value);
+                document.getElementById("timeLeftMessageStart").value = calculatePvsTime(startTime, document.getElementById("pvsMessageStartTimecode").value);
+                document.getElementById("timeLeftPrayerStart").value = calculatePvsTime(startTime, document.getElementById("pvsPrayerStartTimecode").value);
+                document.getElementById("timeLeftPrayerEnd").value = calculatePvsTime(startTime, document.getElementById("pvsPrayerEndTimecode").value);
+                document.getElementById("timeLeftCommentsStart").value = calculatePvsTime(startTime, document.getElementById("pvsCommentsStartTimecode").value);
+                document.getElementById("timeLeftCommentsEnd").value = calculatePvsTime(startTime, document.getElementById("pvsCommentsEndTimecode").value);
+            };
+
+            document.getElementById("currentTime").addEventListener("change", function() {
+                calculateRemainingTime();
+            });
+
+            var count = 0;
+            var counter;
+
+            function timer()
+            {
+                count += 1000; //Add a second to our timer
+                document.getElementById("currentTime").value = moment(count).format("HH:mm:ss");
+                calculateRemainingTime();
+            }
+
+            document.getElementById("startTimerButton").addEventListener("click", function() {
+                count = moment(document.getElementById("currentTime").value, "HH:mm:ss").valueOf();
+                counter=setInterval(timer, 1000); //1000 will  run it every 1 second
+            });
+
+            document.getElementById("stopTimerButton").addEventListener("click", function() {
+                clearInterval(counter);
+            });
+            
+        </script>
+
+
+    </body>
+
+
+</html>
