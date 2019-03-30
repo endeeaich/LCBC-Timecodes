@@ -4,59 +4,79 @@
         <title>Timecodes</title>
         <meta charset="UTF-8"> 
     </head>
+    <style>
+    input:not([type='button']) {
+        width: 6em;
+     }
+     body{
+        background-color:black;
+        color:white;
+     }
+    </style>
 
     <body>
         <h3>PVS Timecode Conversion</h3>
         <div>
             <label>Current Time:&nbsp;</label>
-            <input id = 'currentTime'/>&nbsp;
-            <input id = 'startTimerButton' type="button" value = "Start Timer"/>&nbsp;
-            <input id = 'stopTimerButton' type="button" value = "Stop Timer"/></div>
+            <input id = 'currentTime' value="00:00:00"/>&nbsp;
+            <input id = 'startTimerButton' type="button" value = "Start"/>&nbsp;
+            <input id = 'stopTimerButton' type="button" value = "Stop"/>&nbsp;
+            <input id = 'resetTimerButton' type="button" value = "Reset"/></div>
         <table>
             <tr>
-                <th>Timecode from chat</th>
+                <th>Chat Time</th>
                 <th></th>
-                <th>PVS Timecode</th>
+                <th>PVS Time</th>
                 <th>Time left</th>
             </tr>
             <tr>
-                <td><input id = 'chatRollInTimecode'/></td>
-                <td>Roll In</td>
+                <td ><input id = 'chatRollInTimecode'/></td>
+                <td contenteditable='true'>Roll In</td>
                 <td><input id = 'pvsRollInTimecode' disabled/></td>
                 <td><input id = 'timeLeftRollIn' disabled/></td>
             </tr>
             <tr>
                 <td><input id = 'chatMessageStartTimecode'/></td>
-                <td>Message Start</td>
+                <td contenteditable='true'>Message Start</td>
                 <td><input id = 'pvsMessageStartTimecode' disabled/></td>
                 <td><input id = 'timeLeftMessageStart' disabled/></td>
             </tr>
             <tr>
                 <td><input id = 'chatPrayerStartTimecode'/></td>
-                <td>Prayer Start</td>
+                <td contenteditable='true'>Prayer Start</td>
                 <td><input id = 'pvsPrayerStartTimecode' disabled/></td>
                 <td><input id = 'timeLeftPrayerStart' disabled/></td>
             </tr>
             <tr>
                 <td><input id = 'chatPrayerEndTimecode'/></td>
-                <td>Prayer End</td>
+                <td contenteditable='true'>Prayer End</td>
                 <td><input id = 'pvsPrayerEndTimecode' disabled/></td>
                 <td><input id = 'timeLeftPrayerEnd' disabled/></td>
             </tr>
             <tr>
                 <td><input id = 'chatCommentsStartTimecode'/></td>
-                <td>Comments Start</td>
+                <td contenteditable='true'>Comments Start</td>
                 <td><input id = 'pvsCommentsStartTimecode' disabled/></td>
                 <td><input id = 'timeLeftCommentsStart' disabled/></td>
             </tr>
             <tr>
                 <td><input id = 'chatCommentsEndTimecode'/></td>
-                <td>Comments End</td>
+                <td contenteditable='true'>Comments End</td>
                 <td><input id = 'pvsCommentsEndTimecode' disabled/></td>
                 <td><input id = 'timeLeftCommentsEnd' disabled/></td>
             </tr>
 
         </table>
+
+        <div>
+            <h3>Change Log</h3>
+            <p> - (3/26/19) Current Time defaults to 00:00:00</p>
+            <p> - (3/26/19) Added Reset button that will stop the timer and reset to 00:00:00 while keeping the current chat times</p>
+            <p> - (3/26/19) Updated timer to try and prevent time loss</p>
+            <p> - (3/26/19) Labels are now editable</p>
+            <p> - (3/26/19) Try to clean up bad input</p>
+            <p> - (3/26/19) Resized the text boxes to save space</p>
+        </div>
 
         <script src = "https://momentjs.com/downloads/moment.js"></script>
         <script>
@@ -78,6 +98,7 @@
             }
 
             document.getElementById("chatRollInTimecode").addEventListener("change", function() {
+                document.getElementById("chatRollInTimecode").value = cleanInput(document.getElementById("chatRollInTimecode").value);
                 var startTime = document.getElementById("chatRollInTimecode").value;
                 var endTime =  document.getElementById("chatRollInTimecode").value;
 
@@ -86,6 +107,7 @@
             });
 
             document.getElementById("chatMessageStartTimecode").addEventListener("change", function() {
+                document.getElementById("chatMessageStartTimecode").value = cleanInput(document.getElementById("chatMessageStartTimecode").value);
                 var startTime = document.getElementById("chatRollInTimecode").value;
                 var endTime =  document.getElementById("chatMessageStartTimecode").value;
 
@@ -93,6 +115,7 @@
             });
 
             document.getElementById("chatPrayerStartTimecode").addEventListener("change", function() {
+                document.getElementById("chatPrayerStartTimecode").value = cleanInput(document.getElementById("chatPrayerStartTimecode").value);
                 var startTime = document.getElementById("chatRollInTimecode").value;
                 var endTime =  document.getElementById("chatPrayerStartTimecode").value;
 
@@ -100,6 +123,7 @@
             });
 
             document.getElementById("chatPrayerEndTimecode").addEventListener("change", function() {
+                document.getElementById("chatPrayerEndTimecode").value = cleanInput(document.getElementById("chatPrayerEndTimecode").value);
                 var startTime = document.getElementById("chatRollInTimecode").value;
                 var endTime =  document.getElementById("chatPrayerEndTimecode").value;
                 
@@ -107,6 +131,7 @@
             });
 
             document.getElementById("chatCommentsStartTimecode").addEventListener("change", function() {
+                document.getElementById("chatCommentsStartTimecode").value = cleanInput(document.getElementById("chatCommentsStartTimecode").value);
                 var startTime = document.getElementById("chatRollInTimecode").value;
                 var endTime =  document.getElementById("chatCommentsStartTimecode").value;
 
@@ -114,6 +139,7 @@
             });
 
             document.getElementById("chatCommentsEndTimecode").addEventListener("change", function() {
+                document.getElementById("chatCommentsEndTimecode").value = cleanInput(document.getElementById("chatCommentsEndTimecode").value);
                 var startTime = document.getElementById("chatRollInTimecode").value;
                 var endTime =  document.getElementById("chatCommentsEndTimecode").value;
 
@@ -136,24 +162,116 @@
                 calculateRemainingTime();
             });
 
-            var count = 0;
-            var counter;
+            //var count = 0;
+            //var counter;
 
-            function timer()
+            //function timer()
+            //{
+            //  count += 1000; //Add a second to our timer
+            //  document.getElementById("currentTime").value = moment(count).format("HH:mm:ss");
+            //    calculateRemainingTime();
+            //}
+
+            
+            var startButtonClicked;
+            var beginTimeStamp;
+
+            function timer2()
             {
-                count += 1000; //Add a second to our timer
-                document.getElementById("currentTime").value = moment(count).format("HH:mm:ss");
+                //Created a new timer in an attempt to prevent timeloss.
+                var currentDate = beginTimeStamp + ((new Date()) - startButtonClicked); //current Time = time start value + (time elapsed since start button clicked)
+                document.getElementById("currentTime").value = moment(currentDate).format("HH:mm:ss");
                 calculateRemainingTime();
             }
 
             document.getElementById("startTimerButton").addEventListener("click", function() {
-                count = moment(document.getElementById("currentTime").value, "HH:mm:ss").valueOf();
-                counter=setInterval(timer, 1000); //1000 will  run it every 1 second
+                //count = moment(document.getElementById("currentTime").value, "HH:mm:ss").valueOf(); 
+                //counter=setInterval(timer, 1000); //1000 will  run it every 1 second
+
+                //Clean this here so that it doesnt go through the regex every second
+                document.getElementById("currentTime").value = cleanInput(document.getElementById("currentTime").value);
+
+                var startValue = document.getElementById("currentTime").value;
+                startValue = startValue ? startValue : "00:00:00";
+                beginTimeStamp = moment(startValue, "HH:mm:ss").valueOf();
+                startButtonClicked = new Date();
+                counter=setInterval(timer2, 1000); //1000 will  run every 1 second
             });
 
             document.getElementById("stopTimerButton").addEventListener("click", function() {
                 clearInterval(counter);
+
+                startButtonClicked = null;
+                beginTimeStamp = null;
             });
+
+            document.getElementById("resetTimerButton").addEventListener("click", function() {
+                if (startButtonClicked) {
+                    clearInterval(counter);
+                    startButtonClicked = null;
+                    beginTimeStamp = null;
+                }
+                
+                document.getElementById("currentTime").value = "00:00:00";
+                calculateRemainingTime();
+            });
+
+            //not going to get every scenario, but hopefully this cleans up the most common
+            //Ordered from most common to least common to maximize efficency
+            var cleanInput = function(dirtyValue) {
+                
+                dirtyValue = dirtyValue.trim();//Trim existing whitespace
+                
+                //Good input: 00:00:00
+                if (/^\d{2}:\d{2}:\d{2}$/.test(dirtyValue)) {
+                    return dirtyValue;
+                }
+                //trim exta characters input: 00:00:00XXXXXXXXXXXXXXXX
+                if (/^\d{2}:\d{2}:\d{2}/.test(dirtyValue)) {
+                    return dirtyValue.substring(0,8)
+                }
+                //Missing colons: 000000
+                if (/^\d{6}$/.test(dirtyValue)) {
+                    return dirtyValue.substring(0,2) + ":" + dirtyValue.substring(2,4) + ":" + dirtyValue.substring(4);
+                }
+                //Missing colons/trim extra characters: 000000XXXXXXXXXXX
+                if (/^\d{6}/.test(dirtyValue)) {
+                    return dirtyValue.substring(0,2) + ":" + dirtyValue.substring(2,4) + ":" + dirtyValue.substring(4,6);
+                }
+                //Mising leading hour 0:00:00
+                if (/^\d{1}:\d{2}:\d{2}$/.test(dirtyValue)) {
+                    return "0" + dirtyValue;
+                }
+                //Missing colons: 00000
+                if (/^\d{5}$/.test(dirtyValue)) {
+                    return "0" + dirtyValue.substring(0,1) + ":" + dirtyValue.substring(1,3) + ":" + dirtyValue.substring(3);
+                }
+                //Missing hours: 00:00
+                if (/^\d{2}:\d{2}$/.test(dirtyValue)) {
+                    return "00:" + dirtyValue;
+                }
+                //Missing colons and hour: 0000
+                if (/^\d{4}$/.test(dirtyValue)) {
+                    return "00:" + dirtyValue.substring(0,2) + ":" + dirtyValue.substring(2,4);
+                }
+                //Missing hour and leading minute: 0:00
+                if (/^\d{1}:\d{2}$/.test(dirtyValue)) {
+                    return "00:0" + dirtyValue;
+                }
+                //Missing colons and hour: 000
+                if (/^\d{3}$/.test(dirtyValue)) {
+                    return "00:0" + dirtyValue.substring(0,1) + ":" + dirtyValue.substring(1,3);
+                }
+                //Missing hours/minutes: 00
+                if (/^\d{2}$/.test(dirtyValue)) {
+                    return "00:00:" + dirtyValue;
+                }
+                //Missing hours/minutes leading second 0
+                if (/^\d{1}$/.test(dirtyValue)) {
+                    return "00:00:0" + dirtyValue;
+                }
+                return dirtyValue;
+            }
             
         </script>
 
