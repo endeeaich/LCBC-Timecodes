@@ -196,6 +196,8 @@
                 beginTimeStamp = moment(startValue, "HH:mm:ss").valueOf();
                 startButtonClicked = new Date();
                 counter=setInterval(timer2, 1000); //1000 will  run every 1 second
+                
+                document.getElementById("startTimerButton").setAttribute("disabled", true);
             });
 
             document.getElementById("stopTimerButton").addEventListener("click", function() {
@@ -203,6 +205,9 @@
 
                 startButtonClicked = null;
                 beginTimeStamp = null;
+                
+                
+                document.getElementById("startTimerButton").setAttribute("disabled", false);
             });
 
             document.getElementById("resetTimerButton").addEventListener("click", function() {
@@ -214,6 +219,9 @@
                 
                 document.getElementById("currentTime").value = "00:00:00";
                 calculateRemainingTime();
+                
+                
+                document.getElementById("startTimerButton").setAttribute("disabled", false);
             });
 
             //not going to get every scenario, but hopefully this cleans up the most common
